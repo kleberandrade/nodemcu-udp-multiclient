@@ -17,7 +17,8 @@ typedef struct _udp_packet {
 
 WiFiUDP Udp;
 //UDP_PACKET packet = {1, "room", 0, true};
-UDP_PACKET packet = {2, "kitchen", 0, false};
+//UDP_PACKET packet = {2, "kitchen", 0, false};
+UDP_PACKET packet = {3, "living room", 0, true};
 
 void setup()
 {
