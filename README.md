@@ -40,9 +40,7 @@ if (packetSize) {
 
 ## Code Usage
 
-<figure class="video_container">
-  <iframe src="http://www.youtube.com/watch?v=j2EpkgpPG8g" frameborder="0" allowfullscreen="true"> </iframe>
-</figure>
+[![](http://img.youtube.com/vi/j2EpkgpPG8g/0.jpg)](http://www.youtube.com/watch?v=j2EpkgpPG8g "")
 
 ## License
 
