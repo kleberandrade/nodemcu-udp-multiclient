@@ -38,12 +38,16 @@ WiFiUDP Udp;
 UDP_PACKET packet;
 ```
 
-Client writing message to server
+Server configuration (Access Point - AP)
 
 ```arduino
-Udp.beginPacket(AP_SERVER, SERVER_PORT);
-Udp.write((byte *)&packet, sizeof(UDP_PACKET));
-Udp.endPacket();
+void setup() {
+    Serial.begin(115200);
+    WiFi.disconnect();
+    WiFi.enableAP(false);
+    WiFi.softAP(SERVER_NAME, SERVER_PASWD, SERVER_CHANNEL);
+    Udp.begin(SERVER_PORT);
+}
 ```
 
 Server reading message from client
@@ -53,6 +57,27 @@ int packetSize = Udp.parsePacket();
 if (packetSize) {
     Udp.read((byte *)&packet, sizeof(UDP_PACKET));
 }
+```
+
+Client configuration (Station - STA)
+
+```arduino
+void setup()
+{
+    Serial.begin(115200);
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(SERVER_NAME, SERVER_PASWD);
+    while (WiFi.status() != WL_CONNECTED) { delay(500); }
+    Udp.begin(SERVER_PORT);
+}
+```
+
+Client writing message to server
+
+```arduino
+Udp.beginPacket(AP_SERVER, SERVER_PORT);
+Udp.write((byte *)&packet, sizeof(UDP_PACKET));
+Udp.endPacket();
 ```
 
 ## Example
