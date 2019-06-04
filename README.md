@@ -6,14 +6,14 @@ UDP server with multiclient with NodeMCU ESP8266
 
 Required libraries
 
-```arduino
+```cpp
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 ```
 
 Structure of the message sent between the client and the server
 
-```arduino
+```cpp
 typedef struct _udp_packet {
     int id;
     char local[32];
@@ -24,7 +24,7 @@ typedef struct _udp_packet {
 
 Declaration of constants
 
-```arduino
+```cpp
 const unsigned int SERVER_PORT  = 9999;
 const char *SERVER_NAME         = "NODEMCU";
 const char *SERVER_PASWD        = "";
@@ -33,14 +33,14 @@ const int SERVER_CHANNEL        = 4;
 
 Declaration of variables
 
-```arduino
+```cpp
 WiFiUDP Udp;
 UDP_PACKET packet;
 ```
 
 Server configuration (Access Point - AP)
 
-```arduino
+```cpp
 void setup() {
     Serial.begin(115200);
     WiFi.disconnect();
@@ -52,7 +52,7 @@ void setup() {
 
 Server reading message from client
 
-```arduino
+```cpp
 int packetSize = Udp.parsePacket();
 if (packetSize) {
     Udp.read((byte *)&packet, sizeof(UDP_PACKET));
@@ -61,7 +61,7 @@ if (packetSize) {
 
 Client configuration (Station - STA)
 
-```arduino
+```cpp
 void setup()
 {
     Serial.begin(115200);
@@ -74,7 +74,7 @@ void setup()
 
 Client writing message to server
 
-```arduino
+```cpp
 Udp.beginPacket(AP_SERVER, SERVER_PORT);
 Udp.write((byte *)&packet, sizeof(UDP_PACKET));
 Udp.endPacket();
