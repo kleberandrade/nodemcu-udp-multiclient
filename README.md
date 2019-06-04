@@ -83,11 +83,11 @@ Udp.endPacket();
 ## Example
 
 <p align="left">
-  <img src="https://github.com/kleberandrade/nodemcu-udp-multiclient/blob/master/figures/sample_sw.jpeg" width="400"/>
+  <img src="https://github.com/kleberandrade/nodemcu-udp-multiclient/blob/master/figures/sample_sw.jpeg" width="600"/>
 </p>
 
 <p align="left">
-  <img src="https://github.com/kleberandrade/nodemcu-udp-multiclient/blob/master/figures/sample_hw.jpeg" width="400"/>
+  <img src="https://github.com/kleberandrade/nodemcu-udp-multiclient/blob/master/figures/sample_hw.jpeg" width="600"/>
 </p>
 
 ## Code Usage
