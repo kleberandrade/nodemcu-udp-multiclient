@@ -2,6 +2,36 @@
 
 UDP server with multiclient with NodeMCU ESP8266
 
+## How it works
+
+Structure of the message sent between the client and the server
+
+```arduino
+typedef struct _udp_packet {
+    int id;
+    char local[32];
+    float distance;
+    bool enabled;
+} UDP_PACKET;
+```
+
+Client writing client message
+
+```arduino
+Udp.beginPacket(AP_SERVER, SERVER_PORT);
+Udp.write((byte *)&packet, sizeof(UDP_PACKET));
+Udp.endPacket();
+```
+
+Server reading client message
+
+```arduino
+int packetSize = Udp.parsePacket();
+if (packetSize) {
+    Udp.read((byte *)&packet, sizeof(UDP_PACKET));
+}
+```
+
 ## Example
 
 <p align="center">
