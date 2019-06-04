@@ -8,14 +8,16 @@ const int SERVER_CHANNEL        = 4;
 
 IPAddress AP_SERVER(192, 168, 4, 1);
 
-typedef struct _udp_message {
+typedef struct _udp_packet {
   int id;
-  int distance;
-} UDP_DATA;
+  char local[32];
+  float distance;
+  bool enabled;
+} UDP_PACKET;
 
 WiFiUDP Udp;
-char incomingPacket[255];
-char  replyPacekt[] = "acknowledged";
+//UDP_PACKET packet = {1, "room", 0, true};
+UDP_PACKET packet = {2, "kitchen", 0, false};
 
 void setup()
 {
@@ -38,8 +40,10 @@ void setup()
 
 void loop()
 {
+  packet.distance = random(0, 1000);
+
   Udp.beginPacket(AP_SERVER, SERVER_PORT);
-  Udp.write(replyPacekt);
+  Udp.write((byte *)&packet, sizeof(UDP_PACKET));
   Udp.endPacket();
   delay(1000);
 }

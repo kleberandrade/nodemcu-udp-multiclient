@@ -8,14 +8,18 @@ const int SERVER_CHANNEL        = 4;
 
 IPAddress AP_SERVER(192, 168, 4, 1);
 
-typedef struct _udp_message {
+typedef struct _udp_packet {
   int id;
-  int distance;
-} UDP_DATA;
+  char local[32];
+  float distance;
+  bool enabled;
+} UDP_PACKET;
 
 WiFiUDP Udp;
 char incomingPacket[255];
 char  replyPacekt[] = "acknowledged";
+
+UDP_PACKET packet;
 
 void setup() {
   Serial.begin(115200);
@@ -46,22 +50,21 @@ void loop() {
     Serial.print(", port ");
     Serial.println(Udp.remotePort());
 
-    // read the packet into packetBufffer
-    int len = Udp.read(incomingPacket, 255);
+    int len = Udp.read((byte *)&packet, sizeof(UDP_PACKET));
     if (len > 0) {
       incomingPacket[len] = 0;
     }
 
-    Serial.println("Contents: ");
-    Serial.println(incomingPacket);
+    Serial.print("Contents: ");
+    Serial.print("id = ");
+    Serial.print(packet.id);
+    Serial.print(", local = ");
+    Serial.print(packet.local);
+    Serial.print(", distance = ");
+    Serial.print(packet.distance);
+    Serial.print(", enabled = ");
+    Serial.println(packet.enabled);
   }
-}
-
-void write(char *data) {
-  // send a reply, to the IP address and port that sent us the packet we received
-  Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-  Udp.write(data);
-  Udp.endPacket();
 }
 
 void printWifiStatus() {
