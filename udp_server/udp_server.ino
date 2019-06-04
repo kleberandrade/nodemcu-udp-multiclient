@@ -16,9 +16,6 @@ typedef struct _udp_packet {
 } UDP_PACKET;
 
 WiFiUDP Udp;
-char incomingPacket[255];
-char  replyPacekt[] = "acknowledged";
-
 UDP_PACKET packet;
 
 void setup() {

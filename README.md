@@ -4,6 +4,13 @@ UDP server with multiclient with NodeMCU ESP8266
 
 ## How it works
 
+Required libraries
+
+```arduino
+#include <ESP8266WiFi.h>
+#include <WiFiUdp.h>
+```
+
 Structure of the message sent between the client and the server
 
 ```arduino
@@ -13,6 +20,22 @@ typedef struct _udp_packet {
     float distance;
     bool enabled;
 } UDP_PACKET;
+```
+
+Declaration of constants
+
+```arduino
+const unsigned int SERVER_PORT  = 9999;
+const char *SERVER_NAME         = "NODEMCU";
+const char *SERVER_PASWD        = "";
+const int SERVER_CHANNEL        = 4;
+```
+
+Declaration of variables
+
+```arduino
+WiFiUDP Udp;
+UDP_PACKET packet;
 ```
 
 Client writing message to server
@@ -45,17 +68,17 @@ if (packetSize) {
 ## License
 
     Copyright 2017-2019 Kleber de Oliveira Andrade
-    
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
     copies of the Software, and to permit persons to whom the Software is
     furnished to do so, subject to the following conditions:
-    
+
     The above copyright notice and this permission notice shall be included in all
     copies or substantial portions of the Software.
-    
+
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
