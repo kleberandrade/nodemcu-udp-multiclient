@@ -15,7 +15,7 @@ typedef struct _udp_packet {
 } UDP_PACKET;
 ```
 
-Client writing client message
+Client writing message to server
 
 ```arduino
 Udp.beginPacket(AP_SERVER, SERVER_PORT);
@@ -23,7 +23,7 @@ Udp.write((byte *)&packet, sizeof(UDP_PACKET));
 Udp.endPacket();
 ```
 
-Server reading client message
+Server reading message from client
 
 ```arduino
 int packetSize = Udp.parsePacket();
@@ -34,7 +34,7 @@ if (packetSize) {
 
 ## Example
 
-<p align="center">
+<p align="left">
   <img src="https://github.com/kleberandrade/nodemcu-udp-multiclient/blob/master/figures/sample.jpeg" height="400"/>
 </p>
 
