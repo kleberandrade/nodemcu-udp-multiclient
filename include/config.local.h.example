@@ -1,0 +1,6 @@
+#pragma once
+// Copy to config.local.h (ignored by Git). Use the same credentials on all boards.
+#define WIFI_SSID "NODEMCU"
+#define WIFI_PASSWORD "change-this-password"
+// Use build environments client, client2, client3 for unique IDs.
+#define CLIENT_LOCATION "living room"

@@ -50,3 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Local toolchain, configuration and test artifacts
+.venv/
+.pio/
+.build/
+__pycache__/
+include/config.local.h

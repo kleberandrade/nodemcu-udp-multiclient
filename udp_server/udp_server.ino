@@ -1,79 +1,47 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <Protocol.h>
+#include "config.h"
 
-const unsigned int SERVER_PORT  = 9999;
-const char *SERVER_NAME         = "NODEMCU";
-const char *SERVER_PASWD        = "";
-const int SERVER_CHANNEL        = 4;
-
-IPAddress AP_SERVER(192, 168, 4, 1);
-
-typedef struct _udp_packet {
-  int id;
-  char local[32];
-  float distance;
-  bool enabled;
-} UDP_PACKET;
-
-WiFiUDP Udp;
-UDP_PACKET packet;
+WiFiUDP udp;
+bool listening = false;
 
 void setup() {
   Serial.begin(115200);
   Serial.println();
-
-  WiFi.disconnect();
-  WiFi.enableAP(false);
-  WiFi.softAP(SERVER_NAME, SERVER_PASWD, SERVER_CHANNEL);
-  delay(1000);
-
-  Serial.println("Connected to wifi");
-  printWifiStatus();
-
-  Serial.println("Starting connection to server...");
-  Udp.begin(SERVER_PORT);
+  WiFi.persistent(false);
+  WiFi.mode(WIFI_AP);
+  const IPAddress address(192, 168, 4, 1);
+  if (!WiFi.softAPConfig(address, address, IPAddress(255, 255, 255, 0)) ||
+      !WiFi.softAP(WIFI_SSID, WIFI_PASSWORD, config::channel, false,
+                   config::maxClients)) {
+    Serial.println("Access point setup failed; check config and reset.");
+    return;
+  }
+  listening = udp.begin(config::port) == 1;
+  Serial.printf("AP %s at %s; UDP %u: %s\n", WIFI_SSID,
+                WiFi.softAPIP().toString().c_str(), config::port,
+                listening ? "ready" : "bind failed; reset board");
 }
 
 void loop() {
-  // if there's data available, read a packet
-  int packetSize = Udp.parsePacket();
-  if (packetSize)
-  {
-    Serial.print("Received packet of size ");
-    Serial.println(packetSize);
-    Serial.print("From ");
-    IPAddress remoteIp = Udp.remoteIP();
-    Serial.print(remoteIp);
-    Serial.print(", port ");
-    Serial.println(Udp.remotePort());
-
-    int len = Udp.read((byte *)&packet, sizeof(UDP_PACKET));
-    if (len > 0) {
-      incomingPacket[len] = 0;
-    }
-
-    Serial.print("Contents: ");
-    Serial.print("id = ");
-    Serial.print(packet.id);
-    Serial.print(", local = ");
-    Serial.print(packet.local);
-    Serial.print(", distance = ");
-    Serial.print(packet.distance);
-    Serial.print(", enabled = ");
-    Serial.println(packet.enabled);
+  if (!listening) { delay(100); return; }
+  const int size = udp.parsePacket();
+  if (size <= 0) { delay(1); return; }
+  const IPAddress remote = udp.remoteIP();
+  const uint16_t port = udp.remotePort();
+  // One extra byte and an exact size check prevent accepting a truncated packet.
+  uint8_t buffer[protocol::wireSize + 1];
+  const int length = udp.read(buffer, sizeof(buffer));
+  // parsePacket() releases any unread tail on its next call (ESP8266 core).
+  protocol::Packet packet{};
+  if (size != int(protocol::wireSize) || length != size ||
+      !protocol::decode(buffer, size, packet)) {
+    Serial.printf("Rejected UDP packet (%d bytes)\n", size);
+    return;
   }
-}
-
-void printWifiStatus() {
-  Serial.print("SSID: ");
-  Serial.println(SERVER_NAME);
-
-  IPAddress ip = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(ip);
-
-  long rssi = WiFi.RSSI();
-  Serial.print("signal strength (RSSI):");
-  Serial.print(rssi);
-  Serial.println(" dBm");
+  Serial.printf("%s:%u id=%lu local=%s distance=%.2f enabled=%s\n",
+                remote.toString().c_str(), port,
+                static_cast<unsigned long>(packet.id), packet.local,
+                packet.distance, packet.enabled ? "true" : "false");
 }

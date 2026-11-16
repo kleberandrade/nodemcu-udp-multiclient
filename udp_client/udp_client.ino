@@ -1,50 +1,56 @@
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
+#include <Protocol.h>
+#include "config.h"
 
-const unsigned int SERVER_PORT  = 9999;
-const char *SERVER_NAME         = "NODEMCU";
-const char *SERVER_PASWD        = "";
-const int SERVER_CHANNEL        = 4;
+WiFiUDP udp;
+bool listening = false;
+unsigned long lastSent = 0;
+unsigned long lastStatus = 0;
+protocol::Packet packet = {CLIENT_ID, CLIENT_LOCATION, 0, true};
 
-IPAddress AP_SERVER(192, 168, 4, 1);
-
-typedef struct _udp_packet {
-  int id;
-  char local[32];
-  float distance;
-  bool enabled;
-} UDP_PACKET;
-
-WiFiUDP Udp;
-//UDP_PACKET packet = {1, "room", 0, true};
-//UDP_PACKET packet = {2, "kitchen", 0, false};
-UDP_PACKET packet = {3, "living room", 0, true};
-
-void setup()
-{
+void setup() {
   Serial.begin(115200);
   Serial.println();
-
+  WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
-  Serial.printf("Connecting to %s ", SERVER_NAME);
-  WiFi.begin(SERVER_NAME, SERVER_PASWD);
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println(" connected");
-  Udp.begin(SERVER_PORT);
+  WiFi.setAutoReconnect(true);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.printf("Connecting to %s as client %lu\n", WIFI_SSID,
+                static_cast<unsigned long>(packet.id));
 }
 
-void loop()
-{
-  packet.distance = random(0, 1000);
-
-  Udp.beginPacket(AP_SERVER, SERVER_PORT);
-  Udp.write((byte *)&packet, sizeof(UDP_PACKET));
-  Udp.endPacket();
-  delay(1000);
+void loop() {
+  const unsigned long now = millis();
+  if (WiFi.status() != WL_CONNECTED) {
+    if (listening) { udp.stop(); listening = false; }
+    if (now - lastStatus >= 5000) {
+      Serial.println("Waiting for Wi-Fi (automatic reconnect enabled)");
+      lastStatus = now;
+    }
+    delay(10);
+    return;
+  }
+  if (!listening) {
+    listening = udp.begin(config::port) == 1;
+    Serial.printf("Client IP %s; UDP %s\n", WiFi.localIP().toString().c_str(),
+                  listening ? "ready" : "bind failed; retrying");
+    if (!listening) { delay(1000); return; }
+  }
+  if (now - lastSent >= config::sendIntervalMs) {
+    lastSent = now;
+    packet.distance = static_cast<float>(random(0, 1000));
+    uint8_t buffer[protocol::wireSize];
+    if (!protocol::encode(packet, buffer, sizeof(buffer))) {
+      Serial.println("Invalid client fields; check config");
+    } else if (!udp.beginPacket(WiFi.gatewayIP(), config::port) ||
+               udp.write(buffer, sizeof(buffer)) != sizeof(buffer) ||
+               !udp.endPacket()) {
+      Serial.println("UDP send failed");
+    } else {
+      Serial.printf("Sent id=%lu distance=%.2f\n",
+                    static_cast<unsigned long>(packet.id), packet.distance);
+    }
+  }
+  delay(1);
 }
