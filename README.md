@@ -1,5 +1,14 @@
 # NodeMCU UDP Multiclient
 
+[![CI](https://github.com/kleberandrade/nodemcu-udp-multiclient/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kleberandrade/nodemcu-udp-multiclient/actions/workflows/ci.yml?query=branch%3Amaster)
+[![Language: C++](https://img.shields.io/badge/Language-C%2B%2B-00599C)](src/main.cpp)
+[![Python: 3.11–3.13](https://img.shields.io/badge/Python-3.11%E2%80%933.13-3776AB)](examples/udp_demo.py)
+[![PlatformIO Core: 6.2.0](https://img.shields.io/badge/PlatformIO_Core-6.2.0-F5822A)](requirements.txt)
+[![Espressif8266 platform: 4.2.1](https://img.shields.io/badge/Espressif8266-4.2.1-E7352C)](platformio.ini)
+[![Arduino ESP8266 core: 3.1.2](https://img.shields.io/badge/Arduino_ESP8266-3.1.2-00979D)](platformio.ini)
+[![Board: NodeMCU 1.0 ESP8266](https://img.shields.io/badge/Board-NodeMCU_1.0_ESP8266-00979D)](https://docs.platformio.org/en/latest/boards/espressif8266/nodemcuv2.html)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A small Arduino C++ example for **NodeMCU ESP8266**: one board creates a Wi-Fi
 access point and receives telemetry from several station clients over UDP.
 Clients send an ID, location, simulated distance, and enabled flag once per second.
